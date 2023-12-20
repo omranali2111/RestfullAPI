@@ -1,4 +1,4 @@
-package com.omantourism.RestfullAPI;
+package com.omantourism.RestfullAPI.model;
 
 public class Image {
     public String id;
