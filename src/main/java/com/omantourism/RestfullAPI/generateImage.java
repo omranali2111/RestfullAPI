@@ -1,5 +1,6 @@
 package com.omantourism.RestfullAPI;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,30 +22,31 @@ public class generateImage {
 
     }
     @PostMapping
-    public void createImage(@RequestBody Image img){
-       if(images.add(img)){
-           System.out.println("Image Added ");
-       }
-       else{
-           System.out.println("Image Failed to be Added");
-       }
-
+    @ResponseBody
+    public String createImage(@RequestBody Image img){
+       images.add(img);
+       return ("Image added");
     }
     @PutMapping("/{id}")
-    public void UpdateImage(@PathVariable String id,@RequestBody Image img){
+    public ResponseEntity<String> UpdateImage(@PathVariable String id,@RequestBody Image img){
        Image newImage= getImageById(id);
+        if (img.getId().equals(id)) {
+            img.setDescription(newImage.getDescription());
+            img.setPath(newImage.getPath());
+            return ResponseEntity.ok("Image updated successfully.");
+        }
 
-       img.description=newImage.description;
-       img.path=newImage.path;
-    }
+        return ResponseEntity.badRequest().body("Image with the given ID not found.");
+}
     @DeleteMapping("/{id}")
-    public void deleteImage(@PathVariable String id){
-        Image newImage= getImageById(id);
-        if(images.remove(newImage)){
-            System.out.println("Image deleted");
-        }
-        else{
-            System.out.println("Image filed to be deleted");
+    public ResponseEntity<String> deleteImage(@PathVariable String id) {
+        Image imageToDelete = getImageById(id);
+        if (imageToDelete != null) {
+            images.remove(imageToDelete);
+            return ResponseEntity.ok("Image removed successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Image with the given ID not found.");
         }
     }
+
 }
