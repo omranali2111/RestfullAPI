@@ -20,19 +20,18 @@ public class imageInfoService {
 
     }
     @ResponseBody
-    public String createImage( Image img){
+    public String createImage(Image img){
         images.add(img);
-        return ("Image added");
+        return ("Image info added");
     }
 
 
     public ResponseEntity<String> updateImage(@PathVariable String id, @RequestBody Image img) {
         Image existingImage = getImageById(id);
         if (existingImage != null) {
-            // Update the fields of the existing image with the new values from 'img'
             existingImage.setDescription(img.getDescription());
             existingImage.setPath(img.getPath());
-            return ResponseEntity.ok("Image updated successfully.");
+            return ResponseEntity.ok("Image info updated successfully.");
         }
         return ResponseEntity.badRequest().body("Image with the given ID not found.");
     }
@@ -41,7 +40,7 @@ public class imageInfoService {
         Image imageToDelete = getImageById(id);
         if (imageToDelete != null) {
             images.remove(imageToDelete);
-            return ResponseEntity.ok("Image removed successfully.");
+            return ResponseEntity.ok("Image info removed successfully.");
         } else {
             return ResponseEntity.badRequest().body("Image with the given ID not found.");
         }

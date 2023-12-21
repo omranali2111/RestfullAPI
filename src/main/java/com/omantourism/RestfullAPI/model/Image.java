@@ -10,6 +10,8 @@ public class Image {
         this.description = description;
         this.path = path;
     }
+    public Image() {
+    }
 
     public void setId(String id) {
         this.id = id;
