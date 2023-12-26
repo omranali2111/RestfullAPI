@@ -1,17 +1,28 @@
 package com.omantourism.RestfullAPI.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "images")
 public class Image {
-    public String id;
-    public String description;
-    public String path;
+
+    @Id
+    private String id;
+
+    private String description;
+
+    @Column(name = "file_path")
+    private String path;
 
     public Image(String id, String description, String path) {
         this.id = id;
         this.description = description;
         this.path = path;
     }
-    public Image() {
-    }
+    public Image(){}
 
     public void setId(String id) {
         this.id = id;

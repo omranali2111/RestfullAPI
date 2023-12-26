@@ -7,41 +7,43 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/images")
 public class imageInfoController {
     @Autowired
-    imageInfoService imagesServic;
+    imageInfoService imageInfoService;;
 
     @GetMapping
-    public ArrayList<Image> getAllImages() {
-        return imagesServic.images;
+    public ResponseEntity<List<Image>> getAllImages() {
+        List<Image> images = imageInfoService.getAllImages();
+        return ResponseEntity.ok(images);
     }
 
     @GetMapping("/{id}")
-    public Image getImageById(@PathVariable String id) {
-        return imagesServic.getImageById(id);
-
+    public ResponseEntity<Image> getImageById(@PathVariable String id) {
+        Image image = imageInfoService.getImageById(id);
+        if (image != null) {
+            return ResponseEntity.ok(image);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-
-    public String createImage(@RequestBody Image img) {
-
-        return imagesServic.createImage(img);
-
+    public ResponseEntity<String> createImage(@RequestBody Image img) {
+        imageInfoService.createImage(img);
+        return ResponseEntity.ok("Image created successfully");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> UpdateImage(@PathVariable String id, @RequestBody Image img) {
-        return imagesServic.updateImage(id,img);
+    public ResponseEntity<String> updateImage(@PathVariable String id, @RequestBody Image img) {
+        return imageInfoService.updateImage(id, img);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteImage(@PathVariable String id) {
-
-        return imagesServic.deleteImage(id);
-
+        return imageInfoService.deleteImage(id);
     }
 }

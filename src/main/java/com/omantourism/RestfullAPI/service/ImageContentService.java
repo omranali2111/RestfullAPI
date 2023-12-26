@@ -74,7 +74,7 @@ public class ImageContentService {
 
         Image imageInfo = new Image();
         imageInfo.setId(String.valueOf(IdCounter));
-        imageInfo.setPath(destinationFile.getAbsolutePath());
+        imageInfo.setPath(destinationFile.getPath());
         ImageInfoService.createImage(imageInfo);
         return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
     }
