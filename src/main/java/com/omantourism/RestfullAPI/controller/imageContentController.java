@@ -1,7 +1,10 @@
 package com.omantourism.RestfullAPI.controller;
 
+import com.omantourism.RestfullAPI.model.Image;
 import com.omantourism.RestfullAPI.service.ImageContentService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,23 +22,37 @@ public class imageContentController {
       return imageContentService.showImage(id);
     }
 
+
+
     @PostMapping()
-
-    public ResponseEntity<String> UploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-
-       return imageContentService.UploadImage(file);
+    public ResponseEntity<String> UploadImage(@RequestParam("file") MultipartFile file) {
+        try {
+            Image uploadedImage = imageContentService.uploadImage(file);
+            return ResponseEntity.ok("File uploaded successfully: " + uploadedImage.getPath());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading file");
+        }
     }
-    @PutMapping(path = "/{id}")
-    public ResponseEntity<String> UpdateImage(@PathVariable String id, @RequestParam("file") MultipartFile file) throws IOException {
-
-        return imageContentService.UpdateImage(id,file);
+    @PutMapping("/{id}")
+    public ResponseEntity<String> UpdateImage(@PathVariable String id, @RequestParam("file") MultipartFile file) {
+        try {
+            imageContentService.UpdateImage(id,file);
+            return ResponseEntity.ok("File updated successfully.");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating file");
+        }
     }
 
-    @DeleteMapping(path = "/{id}")
-public ResponseEntity<String> DeleteImage(@PathVariable String id){
-
-        return imageContentService.DeleteImage(id);
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> DeleteImage(@PathVariable int id) {
+        try {
+            imageContentService.deleteImage(id);
+            return ResponseEntity.ok("File and database record deleted successfully.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during file deletion");
+        }
     }
 
 }

@@ -1,30 +1,28 @@
 package com.omantourism.RestfullAPI.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "images")
 public class Image {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
     private String description;
 
     @Column(name = "file_path")
     private String path;
 
-    public Image(String id, String description, String path) {
+    public Image(int id, String description, String path) {
         this.id = id;
         this.description = description;
         this.path = path;
     }
     public Image(){}
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -36,7 +34,7 @@ public class Image {
         this.path = path;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 

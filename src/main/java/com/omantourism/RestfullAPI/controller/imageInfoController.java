@@ -2,11 +2,12 @@ package com.omantourism.RestfullAPI.controller;
 
 import com.omantourism.RestfullAPI.model.Image;
 import com.omantourism.RestfullAPI.service.imageInfoService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,7 +23,7 @@ public class imageInfoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Image> getImageById(@PathVariable String id) {
+    public ResponseEntity<Image> getImageById(@PathVariable int id) {
         Image image = imageInfoService.getImageById(id);
         if (image != null) {
             return ResponseEntity.ok(image);
@@ -38,12 +39,23 @@ public class imageInfoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateImage(@PathVariable String id, @RequestBody Image img) {
-        return imageInfoService.updateImage(id, img);
+    public ResponseEntity<String> updateImage(@PathVariable int id, @RequestBody Image img) {
+        try {
+            imageInfoService.updateImage(id, img);
+            return ResponseEntity.ok("Image info updated successfully.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteImage(@PathVariable String id) {
-        return imageInfoService.deleteImage(id);
+    public ResponseEntity<String> deleteImage(@PathVariable int id) {
+        try {
+            imageInfoService.deleteImage(id);
+            return ResponseEntity.ok("Image successfully deleted.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
+
 }

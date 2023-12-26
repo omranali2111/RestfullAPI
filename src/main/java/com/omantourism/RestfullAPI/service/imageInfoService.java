@@ -2,6 +2,7 @@ package com.omantourism.RestfullAPI.service;
 
 import com.omantourism.RestfullAPI.model.Image;
 import com.omantourism.RestfullAPI.repository.PhotoInfoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,31 +19,29 @@ public class imageInfoService {
         return photoInfoRepository.findAll();
     }
 
-
-    public Image getImageById(String id) {
+    public Image getImageById(int id) {
         return photoInfoRepository.findById(id).orElse(null);
     }
 
-    public String createImage(Image img) {
+    public void createImage(Image img) {
         photoInfoRepository.save(img);
-        return "Image info added";
+
     }
 
-    public ResponseEntity<String> updateImage(String id, Image img) {
-        if (photoInfoRepository.existsById(id)) {
-            img.setId(id);
-            photoInfoRepository.save(img);
-            return ResponseEntity.ok("Image info updated successfully.");
-        }
-        return ResponseEntity.badRequest().body("Image with the given ID not found.");
+    public void updateImage(int id, Image img) {
+        Image existingImage = photoInfoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Image not found with ID: " + id));
+
+        existingImage.setDescription(img.getDescription());
+        existingImage.setPath(img.getPath());
+        photoInfoRepository.save(existingImage);
     }
 
-    public ResponseEntity<String> deleteImage(String id) {
-        if (photoInfoRepository.existsById(id)) {
-            photoInfoRepository.deleteById(id);
-            return ResponseEntity.ok("Image info removed successfully.");
-        } else {
-            return ResponseEntity.badRequest().body("Image with the given ID not found.");
+    public void deleteImage(int id) {
+        if (!photoInfoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Image not found with ID: " + id);
         }
+        photoInfoRepository.deleteById(id);
     }
+
 }

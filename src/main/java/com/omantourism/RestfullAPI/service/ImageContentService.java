@@ -1,6 +1,8 @@
 package com.omantourism.RestfullAPI.service;
 
 import com.omantourism.RestfullAPI.model.Image;
+import com.omantourism.RestfullAPI.repository.PhotoInfoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.config.TikaConfig;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +28,9 @@ import java.util.Optional;
 public class ImageContentService {
     @Autowired
     private imageInfoService ImageInfoService;
-    static public int IdCounter=0;
+
+    private PhotoInfoRepository photoInfoRepository;
+
 
     public ResponseEntity<byte[]> showImage(@PathVariable String id) throws IOException {
         String[] possibleExtensions = {"png", "jpg", "jpeg"};
@@ -59,27 +64,20 @@ public class ImageContentService {
         }
     }
 
-    public ResponseEntity<String> UploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-
-        synchronized (this) {
-            IdCounter++; // Increment the counter
-        }
-
+    public Image uploadImage(MultipartFile file) throws IOException {
+        Image imageInfo = new Image();
+        imageInfo = photoInfoRepository.save(imageInfo); // Create a new record to get the generated ID
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String newFileName = "image_" + IdCounter+"."+extension;
-        File destinationFile = new File("./Data/"+newFileName );
+        String newFileName = "image_" + imageInfo.getId() + "." + extension;
+        File destinationFile = new File("./Data/" + newFileName);
         FileUtils.copyInputStreamToFile(file.getInputStream(), destinationFile);
 
-
-        Image imageInfo = new Image();
-        imageInfo.setId(String.valueOf(IdCounter));
-        imageInfo.setPath(destinationFile.getPath());
-        ImageInfoService.createImage(imageInfo);
-        return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
+        imageInfo.setPath(destinationFile.getAbsolutePath());
+        return photoInfoRepository.save(imageInfo); // Update the record with the file path
     }
 
-    public ResponseEntity<String> UpdateImage(@PathVariable String id, @RequestParam("file") MultipartFile file) throws IOException {
+    public void UpdateImage(@PathVariable String id, @RequestParam("file") MultipartFile file) throws IOException {
 
         String[] possibleExtensions = {"png", "jpg", "jpeg"};
 
@@ -94,24 +92,24 @@ public class ImageContentService {
         File destinationFile = new File("./Data/image_" + id + "." + newExtension);
         FileUtils.copyInputStreamToFile(file.getInputStream(), destinationFile);
 
-        return ResponseEntity.ok("File updated successfully: " + destinationFile.getName());
+
     }
-    public ResponseEntity<String> DeleteImage(@PathVariable String id){
+
+    public void deleteImage(int id) throws IOException {
         String[] possibleExtensions = {"png", "jpg", "jpeg"};
-
-
-        File fileToDelete = Arrays.stream(possibleExtensions)
+        boolean fileDeleted = Arrays.stream(possibleExtensions)
                 .map(ext -> new File("./Data/image_" + id + "." + ext))
                 .filter(File::exists)
                 .findFirst()
-                .orElse(null);
-        boolean deleted = fileToDelete.delete();
-        if (deleted) {
-            return ResponseEntity.ok("File deleted successfully: " + fileToDelete.getName());
+                .map(File::delete)
+                .orElse(false);
+
+        if (photoInfoRepository.existsById(id)) {
+            photoInfoRepository.deleteById(id);
         } else {
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Could not delete file: " + fileToDelete.getName());
+            if (!fileDeleted) {
+                throw new EntityNotFoundException("Image not found with ID: " + id);
+            }
         }
-
     }
 }
