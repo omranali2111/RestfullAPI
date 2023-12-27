@@ -1,6 +1,7 @@
 package com.omantourism.RestfullAPI.controller;
 
 import com.omantourism.RestfullAPI.model.Image;
+import com.omantourism.RestfullAPI.model.ImageAndImageType;
 import com.omantourism.RestfullAPI.service.imageInfoService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class imageInfoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateImage(@PathVariable int id, @RequestBody Image img) {
+    public ResponseEntity<String> updateImage(@PathVariable int id, @RequestBody ImageAndImageType img) {
         try {
             imageInfoService.updateImage(id, img);
             return ResponseEntity.ok("Image info updated successfully.");

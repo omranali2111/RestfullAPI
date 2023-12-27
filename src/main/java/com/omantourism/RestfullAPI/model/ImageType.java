@@ -1,5 +1,6 @@
 package com.omantourism.RestfullAPI.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,7 +11,7 @@ public class ImageType {
     private int id;
     @Column(name = "Photo_Type")
     private String PhotoType;
-
+    @JsonIgnore
     @OneToOne(mappedBy = "imageType")
     private Image image;
 
@@ -18,7 +19,7 @@ public class ImageType {
         this.id = id;
         PhotoType = photoType;
     }
-
+    public ImageType(){}
     public int getId() {
         return id;
     }
