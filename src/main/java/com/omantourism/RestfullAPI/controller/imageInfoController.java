@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/api/v1/images")
 public class imageInfoController {
     @Autowired
-    imageInfoService imageInfoService;;
+    private imageInfoService imageInfoService;;
 
     @GetMapping
     public ResponseEntity<List<Image>> getAllImages() {

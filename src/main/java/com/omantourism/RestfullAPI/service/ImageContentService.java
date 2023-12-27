@@ -28,32 +28,20 @@ import java.util.Optional;
 public class ImageContentService {
     @Autowired
     private imageInfoService ImageInfoService;
-
+    @Autowired
     private PhotoInfoRepository photoInfoRepository;
 
 
-    public ResponseEntity<byte[]> showImage(@PathVariable String id) throws IOException {
+    public File retrieveImageFile(String id) {
         String[] possibleExtensions = {"png", "jpg", "jpeg"};
 
-        Optional<File> fileOptional = Arrays.stream(possibleExtensions)
+        return Arrays.stream(possibleExtensions)
                 .map(ext -> Paths.get("./Data/image_" + id + "." + ext).toFile())
                 .filter(File::exists)
-                .findFirst();
-
-        if (!fileOptional.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        File file = fileOptional.get();
-        byte[] fileContent = FileUtils.readFileToByteArray(file);
-        MediaType mediaType = getMediaType(file);
-
-        return ResponseEntity.ok()
-                .contentType(mediaType)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"")
-                .body(fileContent);
+                .findFirst()
+                .orElse(null);
     }
-    private MediaType getMediaType(File file) {
+    public MediaType getMediaType(File file) {
         MimeTypes mimeTypes = TikaConfig.getDefaultConfig().getMimeRepository();
         try (InputStream input = new BufferedInputStream(new FileInputStream(file))) {
             org.apache.tika.mime.MediaType tikaMediaType = mimeTypes.detect(input, new Metadata());
@@ -66,15 +54,15 @@ public class ImageContentService {
 
     public Image uploadImage(MultipartFile file) throws IOException {
         Image imageInfo = new Image();
-        imageInfo = photoInfoRepository.save(imageInfo); // Create a new record to get the generated ID
+        imageInfo = photoInfoRepository.save(imageInfo);
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String newFileName = "image_" + imageInfo.getId() + "." + extension;
         File destinationFile = new File("./Data/" + newFileName);
         FileUtils.copyInputStreamToFile(file.getInputStream(), destinationFile);
 
-        imageInfo.setPath(destinationFile.getAbsolutePath());
-        return photoInfoRepository.save(imageInfo); // Update the record with the file path
+        imageInfo.setPath(destinationFile.getPath());
+        return photoInfoRepository.save(imageInfo);
     }
 
     public void UpdateImage(@PathVariable String id, @RequestParam("file") MultipartFile file) throws IOException {

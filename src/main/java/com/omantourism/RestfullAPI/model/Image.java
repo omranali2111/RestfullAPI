@@ -15,6 +15,13 @@ public class Image {
     @Column(name = "file_path")
     private String path;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_type_id", referencedColumnName = "id")
+    private ImageType imageType;
+
+
+
+
     public Image(int id, String description, String path) {
         this.id = id;
         this.description = description;
@@ -44,5 +51,13 @@ public class Image {
 
     public String getPath() {
         return path;
+    }
+
+    public ImageType getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(ImageType imageType) {
+        this.imageType = imageType;
     }
 }
