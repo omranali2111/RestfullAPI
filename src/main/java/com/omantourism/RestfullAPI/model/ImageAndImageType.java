@@ -1,7 +1,9 @@
 package com.omantourism.RestfullAPI.model;
 
+import java.util.Set;
+
 public class ImageAndImageType {
     public Image image;
-    public Integer ImageTypeID;
+    public Set<Integer> ImageTypeID;
 
 }

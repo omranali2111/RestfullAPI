@@ -2,6 +2,9 @@ package com.omantourism.RestfullAPI.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
+
+import java.util.Set;
 
 @Entity
 @Table(name = "ImageType")
@@ -10,10 +13,13 @@ public class ImageType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name = "Photo_Type")
+    @Pattern(regexp = "^[a-z|A-Z]+$", message = "Invalid PhotoType format")
     private String PhotoType;
     @JsonIgnore
-    @OneToOne(mappedBy = "imageType")
-    private Image image;
+    @ManyToMany(mappedBy = "imageType")
+    private Set<Image> image;
+
+
 
     public ImageType(int id, String photoType) {
         this.id = id;
@@ -36,11 +42,11 @@ public class ImageType {
         PhotoType = photoType;
     }
 
-    public Image getImage() {
+    public Set<Image> getImage() {
         return image;
     }
 
-    public void setImage(Image image) {
+    public void setImage(Set<Image> image) {
         this.image = image;
     }
 

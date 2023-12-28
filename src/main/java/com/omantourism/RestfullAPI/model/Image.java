@@ -2,6 +2,8 @@ package com.omantourism.RestfullAPI.model;
 
 import jakarta.persistence.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "images")
 public class Image {
@@ -15,9 +17,14 @@ public class Image {
     @Column(name = "file_path")
     private String path;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "image_type_id", referencedColumnName = "id")
-    private ImageType imageType;
+
+    @ManyToMany
+    @JoinTable(
+            name = "image_info_image_type_map",
+            joinColumns = @JoinColumn(name = "imageinfo_id"),
+            inverseJoinColumns = @JoinColumn(name = "imagetype_id")
+    )
+    private Set<ImageType> imageType;
 
 
 
@@ -53,11 +60,12 @@ public class Image {
         return path;
     }
 
-    public ImageType getImageType() {
+
+    public Set<ImageType> getImageType() {
         return imageType;
     }
 
-    public void setImageType(ImageType imageType) {
+    public void setImageType(Set<ImageType> imageType) {
         this.imageType = imageType;
     }
 }

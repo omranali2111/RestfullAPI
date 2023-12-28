@@ -3,6 +3,7 @@ package com.omantourism.RestfullAPI.controller;
 import com.omantourism.RestfullAPI.model.ImageType;
 import com.omantourism.RestfullAPI.repository.ImageTypeRepository;
 import com.omantourism.RestfullAPI.service.imageTypeService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class imageTypeController {
 
 
     @PostMapping
-    public ImageType createImageType(@RequestBody ImageType imageType) {
+    public ImageType createImageType(@Valid @RequestBody ImageType imageType) {
         return ImageTypeService.createImageType(imageType);
     }
 

@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class imageInfoService {
@@ -39,19 +41,13 @@ public class imageInfoService {
         existingImage.setDescription(comingImage.image.getDescription());
         existingImage.setPath(comingImage.image.getPath());
 
-
-        if (comingImage.ImageTypeID != null) {
-            ImageType imageType = imageTypeRepository.findById(comingImage.ImageTypeID)
-                    .orElseThrow(() -> new EntityNotFoundException("ImageType not found with ID: " + comingImage.ImageTypeID));
-            existingImage.setImageType(imageType);
-        } else {
-
-            existingImage.setImageType(null);
-        }
+        Set<ImageType> imageTypes = imageTypeRepository.findAll().stream()
+                .filter(x -> comingImage.ImageTypeID.contains(x.getId()))
+                .collect(Collectors.toSet());
+        existingImage.setImageType(imageTypes);
 
         photoInfoRepository.save(existingImage);
     }
-
 
     public void deleteImage(int id) {
         if (!photoInfoRepository.existsById(id)) {
